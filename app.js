@@ -7,7 +7,7 @@ const content = document.createElement('div');
 
 const NEWS_URL =  'https://api.hnpwa.com/v0/news/1.json';
 const CONTENTS_URL = 'https://api.hnpwa.com/v0/item/@id.json';
-ajax.open('GET', NEWS_URL, false); //동기적으로 처리 한다는 옵션
+/*ajax.open('GET', NEWS_URL, false); //동기적으로 처리 한다는 옵션
 ajax.send();//실제로 가져오기, open만한다고 가져와주는 것이 아님 
 //console.log(ajax.response); //데이터확인- 데이터는 ajax.response에 저장됨 
 
@@ -16,17 +16,23 @@ ajax.send();//실제로 가져오기, open만한다고 가져와주는 것이 �
 //----------------여기부터 처리
 //자바스크립트에서 다루기 쉽도록 response에 있는 것을 preview처럼 바꿔보겠음/응답값 --> 객체
 const newsFeed = JSON.parse(ajax.response);
+*/
 
+function getData(url){
+  ajax.open('GET', url, false);
+  ajax.send();
 
+  return JSON.parse(ajax.response);
+}
+
+const newsFeed = getData(NEWS_URL);
 
 const ul = document.createElement('ul');
 
 window.addEventListener('hashchange', function(){
   const id = location.hash.substr(1);
-  ajax.open('GET', CONTENTS_URL.replace('@id', id), false); //데이터 불러오는 코드 
-  ajax.send(); //데이터들어옴
 
-  const newsContent = JSON.parse(ajax.response); //데이터받기
+  const newsContent =getData(CONTENTS_URL.replace('@id', id)); //데이터받기
   const title = document.createElement('h1');
 
   title.innerHTML=newsContent.title;
