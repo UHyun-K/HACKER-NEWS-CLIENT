@@ -121,19 +121,12 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var ajax = new XMLHttpRequest(); //해커뉴스데이터 가져올 도구 가져오기, 저장하기
 
 var container = document.getElementById("root");
-var content = document.createElement('div');
 var NEWS_URL = 'https://api.hnpwa.com/v0/news/1.json';
 var CONTENTS_URL = 'https://api.hnpwa.com/v0/item/@id.json';
-/*ajax.open('GET', NEWS_URL, false); //동기적으로 처리 한다는 옵션
-ajax.send();//실제로 가져오기, open만한다고 가져와주는 것이 아님 
-//console.log(ajax.response); //데이터확인- 데이터는 ajax.response에 저장됨 
-
-//----------------여기까지 데이터를 가져오는 입력 
-
-//----------------여기부터 처리
-//자바스크립트에서 다루기 쉽도록 response에 있는 것을 preview처럼 바꿔보겠음/응답값 --> 객체
-const newsFeed = JSON.parse(ajax.response);
-*/
+var content = document.createElement('div');
+var store = {
+  currentPage: 1
+};
 
 function getData(url) {
   ajax.open('GET', url, false);
@@ -146,25 +139,30 @@ function newsFeed() {
   var newsList = [];
   newsList.push('<ul>');
 
-  for (var i = 0; i < 10; i++) {
-    newsList.push("\n    <li>\n      <a href=\"#".concat(newsFeed[i].id, "\">\n        ").concat(newsFeed[i].title, "(").concat(newsFeed[i].comments_count, ")\n      </a>\n    </li>\n  "));
+  for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    newsList.push("\n    <li>\n      <a href=\"#/show/".concat(newsFeed[i].id, "\">\n        ").concat(newsFeed[i].title, "(").concat(newsFeed[i].comments_count, ")\n      </a>\n    </li>\n  "));
   }
 
   newsList.push('</ul>');
+  newsList.push("\n  <div>\n    <a href=\"#/page/".concat(store.currentPage > 1 ? store.currentPage - 1 : 1, "\">\uC774\uC804\uD398\uC774\uC9C0</a>\n    <a href=\"#/page/").concat(store.currentPage + 1, "\">\uB2E4\uC74C\uD398\uC774\uC9C0</a>\n  </div>\n")); //if문 쓰기에는 너무짧으니 삼항연산자로 
+
   container.innerHTML = newsList.join('');
 }
 
 function newsDetail() {
-  var id = location.hash.substr(1);
+  var id = location.hash.substr(7);
   var newsContent = getData(CONTENTS_URL.replace('@id', id)); //데이터받기
 
-  container.innerHTML = "\n    <h1>".concat(newsContent.title, "</h1>\n    <div>\n      <a href=\"#\">\uBAA9\uB85D\uC73C\uB85C</a>\n    </div>\n    ");
+  container.innerHTML = "\n    <h1>".concat(newsContent.title, "</h1>\n    <div>\n      <a href=\"#/page/").concat(store.currentPage, "\">\uBAA9\uB85D\uC73C\uB85C</a>\n    </div>\n    ");
 }
 
 function router() {
   var routePath = location.hash;
 
   if (routePath === '') {
+    newsFeed();
+  } else if (routePath.indexOf('#/page/') >= 0) {
+    store.currentPage = Number(routePath.substr(7));
     newsFeed();
   } else {
     newsDetail();
@@ -232,7 +230,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58213" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63491" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
