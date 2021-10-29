@@ -141,17 +141,38 @@ function getData(url) {
   return JSON.parse(ajax.response);
 }
 
-var newsFeed = getData(NEWS_URL);
-var ul = document.createElement('ul');
-window.addEventListener('hashchange', function () {
+function newsFeed() {
+  var newsFeed = getData(NEWS_URL);
+  var newsList = [];
+  newsList.push('<ul>');
+
+  for (var i = 0; i < 10; i++) {
+    newsList.push("\n    <li>\n      <a href=\"#".concat(newsFeed[i].id, "\">\n        ").concat(newsFeed[i].title, "(").concat(newsFeed[i].comments_count, ")\n      </a>\n    </li>\n  "));
+  }
+
+  newsList.push('</ul>');
+  container.innerHTML = newsList.join('');
+}
+
+function newsDetail() {
   var id = location.hash.substr(1);
   var newsContent = getData(CONTENTS_URL.replace('@id', id)); //데이터받기
 
-  var title = document.createElement('h1');
-  title.innerHTML = newsContent.title;
-  content.appendChild(title);
-  console.log(newsContent);
-});
+  container.innerHTML = "\n    <h1>".concat(newsContent.title, "</h1>\n    <div>\n      <a href=\"#\">\uBAA9\uB85D\uC73C\uB85C</a>\n    </div>\n    ");
+}
+
+function router() {
+  var routePath = location.hash;
+
+  if (routePath === '') {
+    newsFeed();
+  } else {
+    newsDetail();
+  }
+}
+
+window.addEventListener('hashchange', router);
+router();
 /*
 for(let i=0; i<10; i++){
   const li = document.createElement('li');
@@ -164,17 +185,25 @@ for(let i=0; i<10; i++){
   ul.appendChild(li);
 }
 */
+
+/*
 //문자열을 활용한 방법 //구조파악이 쉽다.
+for(let i=0; i<10; i++){
+  const div = document.createElement('div');
 
-for (var i = 0; i < 10; i++) {
-  var div = document.createElement('div');
-  div.innerHTML = "\n    <li>\n      <a href=\"#".concat(newsFeed[i].id, "\">\n        ").concat(newsFeed[i].title, "(").concat(newsFeed[i].comments_count, ")\n      </a>\n    </li>\n  "); // ul.appendChild(div.children[0]);
-
+  div.innerHTML=`
+    <li>
+      <a href="#${newsFeed[i].id}">
+        ${newsFeed[i].title}(${newsFeed[i].comments_count})
+      </a>
+    </li>
+  `
+ // ul.appendChild(div.children[0]);
   ul.appendChild(div.firstElementChild);
 }
-
 container.appendChild(ul);
 container.appendChild(content);
+*/
 },{}],"../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -203,7 +232,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49973" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58213" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
