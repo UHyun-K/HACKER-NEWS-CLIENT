@@ -1,5 +1,4 @@
 
-
 const ajax = new XMLHttpRequest(); //해커뉴스데이터 가져올 도구 가져오기, 저장하기
 const container = document.getElementById("root");
 const NEWS_URL =  'https://api.hnpwa.com/v0/news/1.json';
@@ -8,6 +7,7 @@ const CONTENTS_URL = 'https://api.hnpwa.com/v0/item/@id.json';
 
 const store = {
   currentPage: 1,
+  feeds:[],
 };
 
 function getData(url){
@@ -17,35 +17,45 @@ function getData(url){
   return JSON.parse(ajax.response);
 }
 
+function makeFeeds(feeds){ //getdata에 속성 추가 할 용도인데 getData는 자주쓰이니까
+  for(let i =0; i < feeds.length; i++){
+    feeds[i].read =false; //처음엔 다 안읽었으니까
+  }
+  return feeds;
+}
+
 function newsFeed(){
-const newsFeed = getData(NEWS_URL);
+let newsFeed = store.feeds;
 const newsList = [];
 let template = `
-  < <div class="bg-gray-600 min-h-screen">
-  <div class="bg-white text-xl">
-    <div class="mx-auto px-4">
-      <div class="flex justify-between items-center py-6">
-        <div class="flex justify-start">
-          <h1 class="font-extrabold">Hacker News</h1>
-        </div>
-        <div class="items-center justify-end">
-          <a href="#/page/{{__prev_page__}}" class="text-gray-500">
-            Previous
-          </a>
-          <a href="#/page/{{__next_page__}}" class="text-gray-500 ml-4">
-            Next
-          </a>
-        </div>
-      </div> 
-    </div>
-  </div>
-  <div class="p-4 text-2xl text-gray-700">
-    {{__news_feed__}}        
+ 
+<div class="bg-gray-600 min-h-screen">
+<div class="bg-white text-xl">
+  <div class="mx-auto px-4">
+    <div class="flex justify-between items-center py-6">
+      <div class="flex justify-start">
+        <h1 class="font-extrabold">Hacker News</h1>
+      </div>
+      <div class="items-center justify-end">
+        <a href="#/page/{{__prev_page__}}" class="text-gray-500">
+          Previous
+        </a>
+        <a href="#/page/{{__next_page__}}" class="text-gray-500 ml-4">
+          Next
+        </a>
+      </div>
+    </div> 
   </div>
 </div>
-`
-
-
+<div class="p-4 text-2xl text-gray-700">
+  {{__news_feed__}}        
+</div>
+</div>
+`;
+if (newsFeed.length === 0){ //데이터가 없다면
+  newsFeed = store.feeds = makeFeeds(getData(NEWS_URL));  //a맨오른쪽 데이터가 왼쪽으로 그게 왼쪽으로 덮어 들어간다. 
+}
+//아래 삼항연상자 아이번째 뉴스피드의 리드 속성이 참이면 백그라운드 컬러 레드 500 아니면 화이트
 for(let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++){
   newsList.push(`
   <div class="p-6 ${newsFeed[i].read ? 'bg-red-500' : 'bg-white'} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
@@ -109,6 +119,12 @@ function newsDetail(){
     </div>
   </div>
 `;
+
+for(let i =0; i<store.feeds.length; i++){
+  if(store.feeds[i].id === Number(id)){
+    store.feeds[i].read = true;
+    break;
+  }
 }
 
 function makeComment(comments, called = 0) { //called는 호출된 횟수 , 0으로 기본값 설정
@@ -132,6 +148,7 @@ function makeComment(comments, called = 0) { //called는 호출된 횟수 , 0으
 
   return commentString.join('');
 }
+
 
 container.innerHTML = template.replace('{{__comments__}}', makeComment(newsContent.comments));
 }
