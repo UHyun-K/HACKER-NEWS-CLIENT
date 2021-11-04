@@ -1,29 +1,29 @@
-type Score = {
+interface Score {
   currentPage: number;
   feeds: NewsFeed[]; //뉴스피드의 타입이 들억나ㅡㄴ 배열 
 }
-type News ={
-  id: number;
-  time_ago: string;
-  title: string;
-  url: string;
-  user: string;
-  content: string;
+interface News {
+  readonly id: number;
+  readonly time_ago: string;
+  readonly title: string;
+  readonly url: string;
+  readonly user: string;
+  readonly content: string;
 
 }
-type NewsFeed = News & {
-  point: number;
-  comments_count : number;
+interface NewsFeed extends News  {
+  readonly point: number;
+  readonly comments_count : number;
   read?: boolean; //처음에는 데이터가 없다가 나중ㅇ 추가하는 거라
 }
 
-type NewsDetail = News &{
-  comments:NewsComment[];
+interface NewsDetail extends News {
+  readonly comments:NewsComment[];
 }
 
-type NewsComment = News &{
-  comments:NewsComment[];
-  level:number;
+interface NewsComment extends News {
+  readonly comments:NewsComment[];
+  readonly level:number;
 }
 
 const ajax: XMLHttpRequest = new XMLHttpRequest(); //해커뉴스데이터 가져올 도구 가져오기, 저장하기
